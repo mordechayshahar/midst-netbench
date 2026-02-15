@@ -1,4 +1,4 @@
-package ch.ethz.systems.netbench.xpt.vojislav.ports;
+package ch.ethz.systems.netbench.xpt.voijslav.ports;
 
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
@@ -16,7 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import ch.ethz.systems.netbench.core.Simulator;
 import ch.ethz.systems.netbench.core.config.BaseAllowedProperties;
@@ -55,7 +55,7 @@ public class BoundedPriorityOutputPortTest {
         when(sourceNetworkDevice.getIdentifier()).thenReturn(1);
         when(targetNetworkDevice.getIdentifier()).thenReturn(2);
         // Port with 100 packets and 40 packets ECN limit
-        when(link.getBandwidthBitPerNs()).thenReturn(10L);
+        when(link.getBandwidthBitPerNs()).thenReturn(10.0);
         when(link.getDelayNs()).thenReturn(20L);
     }
 

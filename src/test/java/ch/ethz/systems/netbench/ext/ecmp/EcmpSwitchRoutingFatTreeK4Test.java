@@ -9,7 +9,7 @@ import ch.ethz.systems.netbench.core.run.routing.RoutingPopulator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.BufferedWriter;
 import java.io.File;

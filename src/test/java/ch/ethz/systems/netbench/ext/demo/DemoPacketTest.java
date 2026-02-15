@@ -3,7 +3,7 @@ package ch.ethz.systems.netbench.ext.demo;
 import ch.ethz.systems.netbench.core.Simulator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.*;
 

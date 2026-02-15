@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -72,7 +72,7 @@ public class UniformFlowletIntermediaryTest {
     public void testIdentityIncoming() {
         UniformFlowletIntermediary intermediary = new UniformFlowletIntermediary();
         assertEquals(packet, intermediary.adaptIncoming(packet));
-        verifyZeroInteractions(packet);
+        verifyNoInteractions(packet);
     }
 
 }

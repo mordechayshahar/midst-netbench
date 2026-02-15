@@ -5,9 +5,9 @@ import ch.ethz.systems.netbench.core.network.Packet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DemoIntermediaryTest {
@@ -22,7 +22,7 @@ public class DemoIntermediaryTest {
         DemoIntermediary intermediary = (DemoIntermediary) generator.generate(22);
         intermediary.adaptIncoming(packet);
         intermediary.adaptOutgoing(packet);
-        verifyZeroInteractions(packet);
+        verifyNoInteractions(packet);
         Simulator.reset();
     }
 
