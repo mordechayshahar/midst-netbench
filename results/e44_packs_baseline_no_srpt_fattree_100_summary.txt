@@ -1,0 +1,43 @@
+Experiment: e44_packs_baseline_no_srpt_fattree_100
+================================================================================
+
+FLOW COMPLETION TIME METRICS
+--------------------------------------------------------------------------------
+Total flows completed:               31,064
+Total flows:                         49,496
+Mean FCT (ms):                        52.02
+Median FCT (ms):                      13.90
+P95 FCT (ms):                        254.17
+P99 FCT (ms):                        502.60
+Min FCT (ms):                          0.00
+Max FCT (ms):                        956.34
+
+PACKET AND ERROR STATISTICS
+--------------------------------------------------------------------------------
+Packet Statistics:
+  MIDST_NORMAL_PACKETS_ENQUEUED                 45,609,168
+  PACKETS_DROPPED_BURSTY_GT                      4,151,274
+  PACKETS_DROPPED_NORMAL_GT                        120,525
+  PACKETS_DROPPED_QUEUE_REJECT                   4,271,799
+  TCP_TOTAL_PACKETS_SENT                        21,078,811
+  TOTAL_PACKETS_ENQUEUED                        76,522,145
+
+Dropped Packets:
+  PACKETS_DROPPED_BURSTY_GT                      4,151,274
+  PACKETS_DROPPED_NORMAL_GT                        120,525
+  PACKETS_DROPPED_QUEUE_REJECT                   4,271,799
+
+TCP Retransmission Statistics:
+  TCP_FAST_RETRANSMIT                              186,103
+  TCP_RETRANSMISSION_TIMEOUT                     2,413,413
+  TCP_TOTAL_PACKETS_SENT                        21,078,811
+
+MIDST-Specific Statistics:
+  MIDST_NORMAL_PACKETS_ENQUEUED                 45,609,168
+
+KEY METRICS
+--------------------------------------------------------------------------------
+Total packets dropped:            8,543,598
+Packet drop rate:                    11.16%
+RTO count:                        2,413,413
+Fast retransmit count:              186,103

@@ -1,0 +1,58 @@
+Experiment: e49_sppifo_midst_no_srpt_fattree_100
+================================================================================
+
+FLOW COMPLETION TIME METRICS
+--------------------------------------------------------------------------------
+Total flows completed:               30,055
+Total flows:                         49,496
+Mean FCT (ms):                        43.03
+Median FCT (ms):                       9.70
+P95 FCT (ms):                        212.72
+P99 FCT (ms):                        460.88
+Min FCT (ms):                          0.00
+Max FCT (ms):                        906.50
+
+PACKET AND ERROR STATISTICS
+--------------------------------------------------------------------------------
+Packet Statistics:
+  MIDST_BURSTY_PACKETS_ENQUEUED                  7,988,611
+  MIDST_NORMAL_PACKETS_ENQUEUED                 57,290,457
+  PACKETS_DROPPED_BURSTY_GT                      4,669,543
+  PACKETS_DROPPED_NORMAL_GT                        134,110
+  PACKETS_DROPPED_QUEUE_REJECT                   4,803,653
+  SPPIFO_QUEUE_0_ENQUEUED                       38,337,558
+  SPPIFO_QUEUE_1_ENQUEUED                          108,476
+  SPPIFO_QUEUE_2_ENQUEUED                           18,634
+  SPPIFO_QUEUE_3_ENQUEUED                            8,774
+  SPPIFO_QUEUE_4_ENQUEUED                        5,907,982
+  TCP_TOTAL_PACKETS_SENT                        21,063,915
+  TOTAL_PACKETS_ENQUEUED                        75,467,697
+
+Dropped Packets:
+  PACKETS_DROPPED_BURSTY_GT                      4,669,543
+  PACKETS_DROPPED_NORMAL_GT                        134,110
+  PACKETS_DROPPED_QUEUE_REJECT                   4,803,653
+
+TCP Retransmission Statistics:
+  TCP_FAST_RETRANSMIT                              262,556
+  TCP_RETRANSMISSION_TIMEOUT                     2,917,124
+  TCP_TOTAL_PACKETS_SENT                        21,063,915
+
+MIDST-Specific Statistics:
+  MIDST_BURSTY_FLOWS_DETECTED                       29,544
+  MIDST_BURSTY_PACKETS_ENQUEUED                  7,988,611
+  MIDST_BYTES_DURING_CONGESTION                     11,422
+  MIDST_CONGESTION_EPISODES                         23,618
+  MIDST_MONITORING_WINDOWS_COMPLETED                29,956
+  MIDST_MONITORING_WINDOWS_STARTED                  29,967
+  MIDST_NORMAL_PACKETS_ENQUEUED                 57,290,457
+  MIDST_SKETCH_RESETS                               53,563
+  MIDST_SKETCH_ROTATIONS                            17,649
+  MIDST_UNIQUE_FLOWS_PENALIZED                     192,030
+
+KEY METRICS
+--------------------------------------------------------------------------------
+Total packets dropped:            9,607,306
+Packet drop rate:                    12.73%
+RTO count:                        2,917,124
+Fast retransmit count:              262,556

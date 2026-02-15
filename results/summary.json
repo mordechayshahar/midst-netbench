@@ -1,0 +1,190 @@
+[
+  {
+    "experiment": "e44_packs_baseline_no_srpt_fattree_100",
+    "flow_metrics": {
+      "flows_completed": 31064,
+      "flows_total": 49496,
+      "mean_fct_ms": 52.021552800315476,
+      "median_fct_ms": 13.9041245,
+      "p99_fct_ms": 502.604692,
+      "p95_fct_ms": 254.166149,
+      "p90_fct_ms": 151.592125,
+      "min_fct_ms": 0.004864,
+      "max_fct_ms": 956.344726
+    },
+    "statistics": {
+      "MIDST_NORMAL_PACKETS_ENQUEUED": 45609168,
+      "PACKETS_DROPPED_BURSTY_GT": 4151274,
+      "PACKETS_DROPPED_NORMAL_GT": 120525,
+      "PACKETS_DROPPED_QUEUE_REJECT": 4271799,
+      "TCP_FAST_RETRANSMIT": 186103,
+      "TCP_RETRANSMISSION_TIMEOUT": 2413413,
+      "TCP_TOTAL_PACKETS_SENT": 21078811,
+      "TOTAL_PACKETS_ENQUEUED": 76522145
+    }
+  },
+  {
+    "experiment": "e45_packs_midst_no_srpt_fattree_100",
+    "flow_metrics": {
+      "flows_completed": 30674,
+      "flows_total": 49496,
+      "mean_fct_ms": 49.190444012551346,
+      "median_fct_ms": 12.939941,
+      "p99_fct_ms": 466.682448,
+      "p95_fct_ms": 235.654762,
+      "p90_fct_ms": 144.970253,
+      "min_fct_ms": 0.004864,
+      "max_fct_ms": 936.94734
+    },
+    "statistics": {
+      "MIDST_BURSTY_FLOWS_DETECTED": 40629,
+      "MIDST_BURSTY_PACKETS_ENQUEUED": 7514444,
+      "MIDST_BYTES_DURING_CONGESTION": 14695,
+      "MIDST_MONITORING_WINDOWS_COMPLETED": 35579,
+      "MIDST_MONITORING_WINDOWS_STARTED": 35590,
+      "MIDST_NORMAL_PACKETS_ENQUEUED": 59024179,
+      "MIDST_PACKS_CONGESTION_DETECTED": 701,
+      "MIDST_SKETCH_RESETS": 36279,
+      "MIDST_SKETCH_ROTATIONS": 17575,
+      "PACKETS_DROPPED_BURSTY_GT": 4315344,
+      "PACKETS_DROPPED_NORMAL_GT": 121057,
+      "PACKETS_DROPPED_QUEUE_REJECT": 4436401,
+      "TCP_FAST_RETRANSMIT": 291328,
+      "TCP_RETRANSMISSION_TIMEOUT": 2470774,
+      "TCP_TOTAL_PACKETS_SENT": 21163214,
+      "TOTAL_PACKETS_ENQUEUED": 76394126
+    }
+  },
+  {
+    "experiment": "e46_aifo_baseline_no_srpt_fattree_100",
+    "flow_metrics": {
+      "flows_completed": 31064,
+      "flows_total": 49496,
+      "mean_fct_ms": 52.021552800315476,
+      "median_fct_ms": 13.9041245,
+      "p99_fct_ms": 502.604692,
+      "p95_fct_ms": 254.166149,
+      "p90_fct_ms": 151.592125,
+      "min_fct_ms": 0.004864,
+      "max_fct_ms": 956.344726
+    },
+    "statistics": {
+      "MIDST_NORMAL_PACKETS_ENQUEUED": 45609168,
+      "PACKETS_DROPPED": 4271799,
+      "PACKETS_DROPPED_AIFO": 4271799,
+      "PACKETS_DROPPED_BURSTY_GT": 4151274,
+      "PACKETS_DROPPED_NORMAL_GT": 120525,
+      "PACKETS_DROPPED_QUEUE_REJECT": 4271799,
+      "TCP_FAST_RETRANSMIT": 186103,
+      "TCP_RETRANSMISSION_TIMEOUT": 2413413,
+      "TCP_TOTAL_PACKETS_SENT": 21078811,
+      "TOTAL_PACKETS_ENQUEUED": 76522145
+    }
+  },
+  {
+    "experiment": "e47_aifo_midst_no_srpt_fattree_100",
+    "flow_metrics": {
+      "flows_completed": 30919,
+      "flows_total": 49496,
+      "mean_fct_ms": 47.71627697018015,
+      "median_fct_ms": 12.430119,
+      "p99_fct_ms": 461.308034,
+      "p95_fct_ms": 230.128483,
+      "p90_fct_ms": 138.933369,
+      "min_fct_ms": 0.004864,
+      "max_fct_ms": 914.452341
+    },
+    "statistics": {
+      "MIDST_AIFO_CONGESTION_DETECTED": 872,
+      "MIDST_BURSTY_FLOWS_DETECTED": 43793,
+      "MIDST_BURSTY_PACKETS_ENQUEUED": 7956287,
+      "MIDST_BYTES_DURING_CONGESTION": 18495,
+      "MIDST_MONITORING_WINDOWS_COMPLETED": 36950,
+      "MIDST_MONITORING_WINDOWS_STARTED": 36961,
+      "MIDST_NORMAL_PACKETS_ENQUEUED": 58408475,
+      "MIDST_SKETCH_RESETS": 37811,
+      "MIDST_SKETCH_ROTATIONS": 17119,
+      "PACKETS_DROPPED": 4323646,
+      "PACKETS_DROPPED_AIFO": 4323646,
+      "PACKETS_DROPPED_AIFO_BURSTY": 276229,
+      "PACKETS_DROPPED_BURSTY_GT": 4198739,
+      "PACKETS_DROPPED_NORMAL_GT": 124907,
+      "PACKETS_DROPPED_QUEUE_REJECT": 4323646,
+      "TCP_FAST_RETRANSMIT": 325369,
+      "TCP_RETRANSMISSION_TIMEOUT": 2320942,
+      "TCP_TOTAL_PACKETS_SENT": 21001711,
+      "TOTAL_PACKETS_ENQUEUED": 76102192
+    }
+  },
+  {
+    "experiment": "e48_sppifo_baseline_no_srpt_fattree_100",
+    "flow_metrics": {
+      "flows_completed": 32903,
+      "flows_total": 49496,
+      "mean_fct_ms": 45.97693011561256,
+      "median_fct_ms": 12.854884,
+      "p99_fct_ms": 463.538818,
+      "p95_fct_ms": 219.832031,
+      "p90_fct_ms": 127.202781,
+      "min_fct_ms": 0.004864,
+      "max_fct_ms": 951.301847
+    },
+    "statistics": {
+      "MIDST_NORMAL_PACKETS_ENQUEUED": 50513099,
+      "PACKETS_DROPPED": 4104281,
+      "PACKETS_DROPPED_BURSTY_GT": 3987982,
+      "PACKETS_DROPPED_NORMAL_GT": 116299,
+      "SPPIFO_QUEUE_0_DEQUEUED": 50511165,
+      "SPPIFO_QUEUE_0_ENQUEUED": 50513099,
+      "TCP_FAST_RETRANSMIT": 383141,
+      "TCP_RETRANSMISSION_TIMEOUT": 2351960,
+      "TCP_TOTAL_PACKETS_SENT": 22015731,
+      "TOTAL_PACKETS_ENQUEUED": 82925415
+    }
+  },
+  {
+    "experiment": "e49_sppifo_midst_no_srpt_fattree_100",
+    "flow_metrics": {
+      "flows_completed": 30055,
+      "flows_total": 49496,
+      "mean_fct_ms": 43.03378432683414,
+      "median_fct_ms": 9.703955,
+      "p99_fct_ms": 460.883923,
+      "p95_fct_ms": 212.718264,
+      "p90_fct_ms": 123.288331,
+      "min_fct_ms": 0.004864,
+      "max_fct_ms": 906.499921
+    },
+    "statistics": {
+      "MIDST_BURSTY_FLOWS_DETECTED": 29544,
+      "MIDST_BURSTY_PACKETS_ENQUEUED": 7988611,
+      "MIDST_BYTES_DURING_CONGESTION": 11422,
+      "MIDST_CONGESTION_EPISODES": 23618,
+      "MIDST_MONITORING_WINDOWS_COMPLETED": 29956,
+      "MIDST_MONITORING_WINDOWS_STARTED": 29967,
+      "MIDST_NORMAL_PACKETS_ENQUEUED": 57290457,
+      "MIDST_SKETCH_RESETS": 53563,
+      "MIDST_SKETCH_ROTATIONS": 17649,
+      "MIDST_UNIQUE_FLOWS_PENALIZED": 192030,
+      "PACKETS_DROPPED_BURSTY_GT": 4669543,
+      "PACKETS_DROPPED_NORMAL_GT": 134110,
+      "PACKETS_DROPPED_QUEUE_REJECT": 4803653,
+      "SPPIFO_DROPS_TOTAL": 4803653,
+      "SPPIFO_PUSHED_TO_LOWER_QUEUE": 137373,
+      "SPPIFO_QUEUE_0_DEQUEUED": 38337354,
+      "SPPIFO_QUEUE_0_ENQUEUED": 38337558,
+      "SPPIFO_QUEUE_1_DEQUEUED": 108276,
+      "SPPIFO_QUEUE_1_ENQUEUED": 108476,
+      "SPPIFO_QUEUE_2_DEQUEUED": 18434,
+      "SPPIFO_QUEUE_2_ENQUEUED": 18634,
+      "SPPIFO_QUEUE_3_DEQUEUED": 8574,
+      "SPPIFO_QUEUE_3_ENQUEUED": 8774,
+      "SPPIFO_QUEUE_4_DEQUEUED": 5907771,
+      "SPPIFO_QUEUE_4_ENQUEUED": 5907982,
+      "TCP_FAST_RETRANSMIT": 262556,
+      "TCP_RETRANSMISSION_TIMEOUT": 2917124,
+      "TCP_TOTAL_PACKETS_SENT": 21063915,
+      "TOTAL_PACKETS_ENQUEUED": 75467697
+    }
+  }
+]

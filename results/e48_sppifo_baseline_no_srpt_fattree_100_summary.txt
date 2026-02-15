@@ -1,0 +1,44 @@
+Experiment: e48_sppifo_baseline_no_srpt_fattree_100
+================================================================================
+
+FLOW COMPLETION TIME METRICS
+--------------------------------------------------------------------------------
+Total flows completed:               32,903
+Total flows:                         49,496
+Mean FCT (ms):                        45.98
+Median FCT (ms):                      12.85
+P95 FCT (ms):                        219.83
+P99 FCT (ms):                        463.54
+Min FCT (ms):                          0.00
+Max FCT (ms):                        951.30
+
+PACKET AND ERROR STATISTICS
+--------------------------------------------------------------------------------
+Packet Statistics:
+  MIDST_NORMAL_PACKETS_ENQUEUED                 50,513,099
+  PACKETS_DROPPED                                4,104,281
+  PACKETS_DROPPED_BURSTY_GT                      3,987,982
+  PACKETS_DROPPED_NORMAL_GT                        116,299
+  SPPIFO_QUEUE_0_ENQUEUED                       50,513,099
+  TCP_TOTAL_PACKETS_SENT                        22,015,731
+  TOTAL_PACKETS_ENQUEUED                        82,925,415
+
+Dropped Packets:
+  PACKETS_DROPPED                                4,104,281
+  PACKETS_DROPPED_BURSTY_GT                      3,987,982
+  PACKETS_DROPPED_NORMAL_GT                        116,299
+
+TCP Retransmission Statistics:
+  TCP_FAST_RETRANSMIT                              383,141
+  TCP_RETRANSMISSION_TIMEOUT                     2,351,960
+  TCP_TOTAL_PACKETS_SENT                        22,015,731
+
+MIDST-Specific Statistics:
+  MIDST_NORMAL_PACKETS_ENQUEUED                 50,513,099
+
+KEY METRICS
+--------------------------------------------------------------------------------
+Total packets dropped:            4,104,281
+Packet drop rate:                     4.95%
+RTO count:                        2,351,960
+Fast retransmit count:              383,141
