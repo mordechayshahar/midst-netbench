@@ -1,5 +1,8 @@
 package ch.ethz.systems.netbench.core.network;
 
+import ch.ethz.systems.netbench.core.log.SimulationLogger;
+import ch.ethz.systems.netbench.xpt.tcpbase.FullExtTcpPacket;
+
 /**
  * Event for the dispatch of a packet, i.e. when all of the bits
  * of the packet have been written to the link.
@@ -16,15 +19,24 @@ public class PacketDispatchedEvent extends Event {
      * @param packet            Packet instance which is dispatched
      * @param dispatchPort      Port that has finished writing the packet to the link
      */
-    PacketDispatchedEvent(long timeFromNowNs, Packet packet, OutputPort dispatchPort) {
+    public PacketDispatchedEvent(long timeFromNowNs, Packet packet, OutputPort dispatchPort) {
         super(timeFromNowNs);
         this.packet = packet;
         this.dispatchPort = dispatchPort;
+
     }
 
     @Override
     public void trigger() {
+
         dispatchPort.dispatch(packet);
+
+        // Log rank of packet enqueued and queue selected if enabled
+        //if(SimulationLogger.hasRankMappingEnabled()){
+        //    FullExtTcpPacket p = (FullExtTcpPacket) packet;
+        //    int rank = (int)p.getPriority();
+        //    SimulationLogger.logRankMapping(dispatchPort.getOwnId(), rank, 0);
+        //}
     }
 
     @Override

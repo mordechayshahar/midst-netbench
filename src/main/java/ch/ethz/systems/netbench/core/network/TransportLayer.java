@@ -1,6 +1,7 @@
 package ch.ethz.systems.netbench.core.network;
 
 import ch.ethz.systems.netbench.ext.basic.IpPacket;
+import ch.ethz.systems.netbench.xpt.tcpbase.FullExtTcpPacket;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +28,11 @@ public abstract class TransportLayer {
     private Map<Long, Socket> flowIdToSocket;
     private Set<Long> finishedFlowIds;
 
+    // Map priority carried by data packets to flow identifier. Purpose: so that the same priority can
+    // be applied to ACK packets as well. Only works for those cases in which priorities are fixed throughout all packets
+    // of the flow.
+    private Map<Long, Long> flowIdToPriority;
+
     private NetworkDevice networkDevice;
     protected final int identifier;
 
@@ -34,6 +40,7 @@ public abstract class TransportLayer {
         this.identifier = identifier;
         this.flowIdToSocket = new HashMap<>();
         this.finishedFlowIds = new HashSet<>();
+        this.flowIdToPriority = new HashMap<>();
     }
 
     /**
@@ -70,7 +77,9 @@ public abstract class TransportLayer {
 
         // If the socket does not yet exist, it is an incoming socket
         if (socket == null && !finishedFlowIds.contains(packet.getFlowId())) {
-            socket = createSocket(packet.getFlowId(), packet.getSourceId(), -1);
+
+            // Create the socket instance in the other direction
+            socket = createSocket(packet.getFlowId(), packet.getSourceId(),-1);
             flowIdToReceiver.put(packet.getFlowId(), this);
             flowIdToSocket.put(packet.getFlowId(), socket);
         }
@@ -123,6 +132,10 @@ public abstract class TransportLayer {
     private void removeSocket(long flowId) {
         this.finishedFlowIds.add(flowId);
         this.flowIdToSocket.remove(flowId);
+    }
+
+    public long getFlowPriority(long flowId){
+        return this.flowIdToPriority.get(flowId);
     }
 
     /**

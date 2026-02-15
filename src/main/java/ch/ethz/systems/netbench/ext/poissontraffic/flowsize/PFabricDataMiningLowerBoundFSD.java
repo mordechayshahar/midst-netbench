@@ -22,7 +22,7 @@ import ch.ethz.systems.netbench.core.log.SimulationLogger;
  *
  * Expected flow size (lower bound):
  * 0.1*1+0.1*180+0.1*216+0.1*560+0.1*900+0.1*1100+0.1*1870
-   +0.1*3160+0.1*10000+0.05*400000+0.03*3160000+0.02*100000000
+ +0.1*3160+0.1*10000+0.05*400000+0.03*3160000+0.02*100000000
  * =
  * 2116598.7 bytes
  * At 10 Gbps would take 1.69ms

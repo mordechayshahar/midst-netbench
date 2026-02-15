@@ -712,8 +712,7 @@ public class NewRenoTcpSocket extends Socket {
      *
      * @param packet    TCP packet instance
      */
-    private void handleDataPacket(TcpPacket packet) {
-
+    public void handleDataPacket(TcpPacket packet) {
         // Invariants
         // The receiver is always at FIRST_SEQ_NUMBER+1, having sent only the ACK+SYN message
         // For the sender, if the ACK message did not arrive, it will receive

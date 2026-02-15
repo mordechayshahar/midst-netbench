@@ -2,8 +2,11 @@ package ch.ethz.systems.netbench.core.network;
 
 import ch.ethz.systems.netbench.core.Simulator;
 import ch.ethz.systems.netbench.core.log.PortLogger;
+import ch.ethz.systems.netbench.core.log.SimulationLogger;
+import ch.ethz.systems.netbench.xpt.tcpbase.FullExtTcpPacket;
 
 import java.util.Queue;
+
 
 /**
  * Abstraction for an output port on a network device.
@@ -68,37 +71,6 @@ public abstract class OutputPort {
      */
     public abstract void enqueue(Packet packet);
 
-    /**
-     * Enqueue the given packet.
-     *
-     * @param packet    Packet instance
-     */
-    protected final void guaranteedEnqueue(Packet packet) {
-
-        // If it is not sending, then the queue is empty at the moment,
-        // so this packet can be immediately send
-        if (!isSending) {
-
-            // Link is now being utilized
-            logger.logLinkUtilized(true);
-
-            // Add event when sending is finished
-            Simulator.registerEvent(new PacketDispatchedEvent(
-                    packet.getSizeBit() / link.getBandwidthBitPerNs(),
-                    packet,
-                    this
-            ));
-
-            // It is now sending again
-            isSending = true;
-
-        } else { // If it is still sending, the packet is added to the queue, making it non-empty
-            bufferOccupiedBits += packet.getSizeBit();
-            queue.add(packet);
-            logger.logQueueState(queue.size(), bufferOccupiedBits);
-        }
-
-    }
 
     /**
      * Called when a packet has actually been send completely.
@@ -128,16 +100,16 @@ public abstract class OutputPort {
 
             // Pop from queue
             Packet packetFromQueue = queue.poll();
+
             decreaseBufferOccupiedBits(packetFromQueue.getSizeBit());
             logger.logQueueState(queue.size(), bufferOccupiedBits);
 
             // Register when the packet is actually dispatched
             Simulator.registerEvent(new PacketDispatchedEvent(
-                    packetFromQueue.getSizeBit() / link.getBandwidthBitPerNs(),
+                    (long)((double)packet.getSizeBit() / link.getBandwidthBitPerNs()),
                     packetFromQueue,
                     this
             ));
-
             // It is sending again
             isSending = true;
 
@@ -145,10 +117,9 @@ public abstract class OutputPort {
 
             // If the queue is empty, nothing will be sent for now
             logger.logLinkUtilized(false);
-
         }
-
     }
+
 
     /**
      * Return the network identifier of its own device (to which this output port is attached to).
@@ -226,6 +197,15 @@ public abstract class OutputPort {
         return queue;
     }
 
+    protected Boolean getIsSending() { return isSending; }
+
+    protected void setIsSending() { isSending = true; }
+
+    protected PortLogger getLogger() {
+        return logger;
+    }
+
+
     /**
      * Change the amount of bits occupied in the buffer with a delta.
      *
@@ -239,4 +219,11 @@ public abstract class OutputPort {
         assert(bufferOccupiedBits >= 0);
     }
 
+    protected void increaseBufferOccupiedBits(long deltaAmount) {
+        bufferOccupiedBits += deltaAmount;
+    }
+
+    protected Link getLink() {
+        return link;
+    }
 }

@@ -25,6 +25,16 @@ public class SimulationLogger {
     private static BufferedWriter writerPortUtilizationCsvFile;
     private static Map<String, BufferedWriter> writersAdded = new HashMap<>();
 
+    // SP-PIFO Extension
+    private static BufferedWriter writerRanktoQueuesMapping;
+    private static boolean rankMappingEnabled;
+    private static BufferedWriter writerQueueBoundTracking;
+    private static boolean queueBoundTrackingEnabled;
+    private static BufferedWriter writerUnpifonessTracking;
+    private static boolean unpifonessTrackingEnabled;
+    private static BufferedWriter writerInversionsTracking;
+    private static boolean inversionsTrackingEnabled;
+
     // Specific component loggers
     private static List<PortLogger> portLoggers = new ArrayList<>();
     private static List<FlowLogger> flowLoggers = new ArrayList<>();
@@ -113,6 +123,11 @@ public class SimulationLogger {
             // Enabling human readable version
             logHumanReadableFlowCompletionEnabled = tempRunConfiguration.getBooleanPropertyWithDefault("enable_generate_human_readable_flow_completion_log", true);
 
+            // SP-PIFO: Enabling logs
+            rankMappingEnabled = tempRunConfiguration.getBooleanPropertyWithDefault("enable_rank_mapping", false);
+            queueBoundTrackingEnabled = tempRunConfiguration.getBooleanPropertyWithDefault("enable_queue_bound_tracking", false);
+            unpifonessTrackingEnabled = tempRunConfiguration.getBooleanPropertyWithDefault("enable_unpifoness_tracking", false);
+            inversionsTrackingEnabled = tempRunConfiguration.getBooleanPropertyWithDefault("enable_inversions_tracking", false);
         }
 
         // Overwrite if run folder name was specified in run configuration
@@ -151,6 +166,20 @@ public class SimulationLogger {
             writerPortQueueStateFile = openWriter("port_queue_length.csv.log");
             writerPortUtilizationCsvFile = openWriter("port_utilization.csv.log");
             writerPortUtilizationFile = openWriter("port_utilization.log");
+
+            // SP-PIFO log writers
+            if (rankMappingEnabled){
+                writerRanktoQueuesMapping = openWriter("rank_mapping.csv.log");
+            }
+            if (queueBoundTrackingEnabled){
+                writerQueueBoundTracking = openWriter("queuebound_tracking.csv.log");
+            }
+            if (unpifonessTrackingEnabled){
+                writerUnpifonessTracking = openWriter("unpifoness_tracking.csv.log");
+            }
+            if(inversionsTrackingEnabled){
+                writerInversionsTracking = openWriter("inversions_tracking.csv.log");
+            }
 
             // Flow log writers
             writerFlowThroughputFile = openWriter("flow_throughput.csv.log");
@@ -248,6 +277,20 @@ public class SimulationLogger {
             writerPortUtilizationCsvFile.close();
             writerFlowCompletionFile.close();
 
+            // SP-PIFO: Close log files
+            if (rankMappingEnabled){
+                writerRanktoQueuesMapping.close();
+            }
+            if (queueBoundTrackingEnabled){
+                writerQueueBoundTracking.close();
+            }
+            if (unpifonessTrackingEnabled){
+                writerUnpifonessTracking.close();
+            }
+            if(inversionsTrackingEnabled){
+                writerInversionsTracking.close();
+            }
+
             // Also added ones are closed automatically at the end
             for (BufferedWriter writer : writersAdded.values()) {
                 writer.close();
@@ -269,6 +312,39 @@ public class SimulationLogger {
             throw new LogFailureException(e);
         }
 
+    }
+
+    /* SP-PIFO Logging */
+    public static void logRankMapping(int id, long rank, long queue) {
+        try {
+            writerRanktoQueuesMapping.write(id + "," + rank + "," + queue + "\n");
+        } catch (IOException e) {
+            throw new LogFailureException(e);
+        }
+    }
+
+    public static void logQueueBound(int id, int queue, int queueBound) {
+        try {
+            writerQueueBoundTracking.write(id + "," + queue + "," + queueBound + "\n");
+        } catch (IOException e) {
+            throw new LogFailureException(e);
+        }
+    }
+
+    public static void logInversionsPerRank(int id, int rank, long inversion) {
+        try {
+            writerInversionsTracking.write(id + "," + rank + "," + inversion + "\n");
+        } catch (IOException e) {
+            throw new LogFailureException(e);
+        }
+    }
+
+    public static void logUnpifoness(int id, long unpifoness) {
+        try {
+            writerUnpifonessTracking.write(id + "," + unpifoness + "\n");
+        } catch (IOException e) {
+            throw new LogFailureException(e);
+        }
     }
 
     /**
@@ -381,14 +457,14 @@ public class SimulationLogger {
                 // flowId, sourceId, targetId, sentBytes, totalBytes, flowStartTime, flowEndTime, flowDuration, isCompleted
                 writerFlowCompletionCsvFile.write(
                         logger.getFlowId() + "," +
-                        logger.getSourceId() + "," +
-                        logger.getTargetId() + "," +
-                        logger.getTotalBytesReceived() + "," +
-                        logger.getFlowSizeByte() + "," +
-                        logger.getFlowStartTime() + "," +
-                        (logger.isCompleted() ? logger.getFlowEndTime() : Simulator.getCurrentTime()) + "," +
-                        (logger.isCompleted() ? (logger.getFlowEndTime() - logger.getFlowStartTime()) : (Simulator.getCurrentTime() - logger.getFlowStartTime())) + "," +
-                        (logger.isCompleted() ? "TRUE" : "FALSE") + "\n"
+                                logger.getSourceId() + "," +
+                                logger.getTargetId() + "," +
+                                logger.getTotalBytesReceived() + "," +
+                                logger.getFlowSizeByte() + "," +
+                                logger.getFlowStartTime() + "," +
+                                (logger.isCompleted() ? logger.getFlowEndTime() : Simulator.getCurrentTime()) + "," +
+                                (logger.isCompleted() ? (logger.getFlowEndTime() - logger.getFlowStartTime()) : (Simulator.getCurrentTime() - logger.getFlowStartTime())) + "," +
+                                (logger.isCompleted() ? "TRUE" : "FALSE") + "\n"
                 );
 
             }
@@ -437,10 +513,10 @@ public class SimulationLogger {
             for (PortLogger logger : portLoggers) {
                 writerPortUtilizationCsvFile.write(
                         logger.getOwnId() + "," +
-                        logger.getTargetId() + "," +
-                        (logger.isAttachedToServer() ? "Y" : "N") + "," +
-                        logger.getUtilizedNs() + "," +
-                        (((double) logger.getUtilizedNs() / (double) Simulator.getCurrentTime()) * 100) + "\n"
+                                logger.getTargetId() + "," +
+                                (logger.isAttachedToServer() ? "Y" : "N") + "," +
+                                logger.getUtilizedNs() + "," +
+                                (((double) logger.getUtilizedNs() / (double) Simulator.getCurrentTime()) * 100) + "\n"
                 );
                 writerPortUtilizationFile.write(
                         String.format(
@@ -522,5 +598,17 @@ public class SimulationLogger {
         close();
         throwaway();
     }
+
+    public static boolean hasRankMappingEnabled() {
+        return rankMappingEnabled;
+    }
+
+    public static boolean hasQueueBoundTrackingEnabled() {
+        return queueBoundTrackingEnabled;
+    }
+
+    public static boolean hasUnpifonessTrackingEnabled() { return unpifonessTrackingEnabled; }
+
+    public static boolean hasInversionsTrackingEnabled() { return inversionsTrackingEnabled; }
 
 }

@@ -1,11 +1,8 @@
 package ch.ethz.systems.netbench.ext.basic;
 
-import ch.ethz.systems.netbench.core.network.NetworkDevice;
-import ch.ethz.systems.netbench.core.network.Link;
-import ch.ethz.systems.netbench.core.network.OutputPort;
+import ch.ethz.systems.netbench.core.Simulator;
+import ch.ethz.systems.netbench.core.network.*;
 import ch.ethz.systems.netbench.core.log.SimulationLogger;
-import ch.ethz.systems.netbench.core.network.Packet;
-
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class EcnTailDropOutputPort extends OutputPort {
@@ -38,7 +35,30 @@ public class EcnTailDropOutputPort extends OutputPort {
 
         // Tail-drop enqueue
         if (getBufferOccupiedBits() + ipHeader.getSizeBit() <= maxQueueSizeBits) {
-            guaranteedEnqueue(packet);
+
+            // If it is not sending, then the queue is empty at the moment,
+            // so this packet can be immediately send
+            if (!getIsSending()) {
+
+                // Link is now being utilized
+                getLogger().logLinkUtilized(true);
+
+                // Add event when sending is finished
+                Simulator.registerEvent(new PacketDispatchedEvent(
+                        (long)((double)packet.getSizeBit() / getLink().getBandwidthBitPerNs()),
+                        packet,
+                        this
+                ));
+
+                // It is now sending again
+                setIsSending();
+
+            } else { // If it is still sending, the packet is added to the queue, making it non-empty
+                getQueue().add(packet);
+                increaseBufferOccupiedBits(packet.getSizeBit());
+                getLogger().logQueueState(getQueue().size(), getBufferOccupiedBits());
+            }
+
         } else {
             SimulationLogger.increaseStatisticCounter("PACKETS_DROPPED");
             if (ipHeader.getSourceId() == this.getOwnId()) {

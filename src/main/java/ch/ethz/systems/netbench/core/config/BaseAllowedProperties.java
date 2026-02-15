@@ -10,6 +10,13 @@ public class BaseAllowedProperties {
             "enable_log_port_queue_state",
             "enable_log_flow_throughput",
             "enable_generate_human_readable_flow_completion_log",
+            "enable_log_delay",
+
+            // SP-PIFO
+            "enable_rank_mapping",
+            "enable_queue_bound_tracking",
+            "enable_unpifoness_tracking",
+            "enable_inversions_tracking"
     };
 
     public static final String[] PROPERTIES_RUN = new String[] {
@@ -45,7 +52,6 @@ public class BaseAllowedProperties {
             "traffic_probabilities_active_fraction_is_ordered",
             "traffic_lambda_flow_starts_per_s"
 
-
     };
 
     public static final String[] EXTENSION = new String[]{
@@ -76,11 +82,22 @@ public class BaseAllowedProperties {
 
             "traffic_probabilities_fraction_A",
             "traffic_probabilities_mass_A",
-
-
     };
 
     public static final String[] EXPERIMENTAL = new String[]{
+
+            // SP-PIFO
+            "output_port_number_queues",
+            "output_port_max_size_per_queue_packets",
+            "output_port_max_size_packets",
+            "output_port_max_rank",
+            "output_port_bytes_per_round",
+            "output_port_initialization",
+            "output_port_fix_queue_bounds",
+            "output_port_step_size",
+            "output_port_adaptation_period",
+            "transport_layer_rank_distribution",
+            "transport_layer_rank_bound",
 
             // TCP
             "TCP_ROUND_TRIP_TIMEOUT_NS",

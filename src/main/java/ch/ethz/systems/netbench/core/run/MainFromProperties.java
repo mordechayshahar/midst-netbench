@@ -69,7 +69,6 @@ public class MainFromProperties {
         } else {
             System.out.println("No analysis command given; analysis is skipped.");
         }
-
     }
 
     /**

@@ -35,11 +35,6 @@ class TrafficSelector {
                 FlowSizeDistribution flowSizeDistribution;
                 switch (Simulator.getConfiguration().getPropertyOrFail("traffic_flow_size_dist")) {
 
-                    case "original_simon": {
-                        flowSizeDistribution = new OriginalSimonFSD();
-                        break;
-                    }
-
                     case "pfabric_data_mining_lower_bound": {
                         flowSizeDistribution = new PFabricDataMiningLowerBoundFSD();
                         break;
@@ -51,6 +46,16 @@ class TrafficSelector {
 
                     case "pfabric_web_search_lower_bound": {
                         flowSizeDistribution = new PFabricWebSearchLowerBoundFSD();
+                        break;
+                    }
+
+                    case "pfabric_data_mining_albert": {
+                        flowSizeDistribution = new pFabricDataMiningAlbert();
+                        break;
+                    }
+
+                    case "pfabric_web_search_albert": {
+                        flowSizeDistribution = new pFabricWebSearchAlbert();
                         break;
                     }
 

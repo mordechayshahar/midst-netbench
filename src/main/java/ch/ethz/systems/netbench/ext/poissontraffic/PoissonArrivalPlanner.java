@@ -601,7 +601,6 @@ public class PoissonArrivalPlanner extends TrafficPlanner {
             // Register flow
             Pair<Integer, Integer> pair = choosePair();
             registerFlow(time, pair.getLeft(), pair.getRight(), flowSizeDistribution.generateFlowSizeByte());
-
             // Advance time to next arrival
             time += interArrivalTime;
             x++;
