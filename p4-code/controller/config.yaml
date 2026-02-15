@@ -1,0 +1,58 @@
+# MIDST Control Plane Configuration
+
+switch:
+  thrift_port: 9090           # BMv2 Thrift RPC port
+  thrift_host: "localhost"
+
+virtual_queue:
+  high_watermark_packets: 5
+  low_watermark_packets: 2
+  high_watermark_bits: 60000  # 5 * 1500 * 8
+  low_watermark_bits: 24000   # 2 * 1500 * 8
+
+sketch:
+  size: 256                   # columns per hash row
+  num_hash_functions: 4       # hash rows
+  total_size: 1024            # size * num_hash_functions
+  hash_seeds:
+    - 0x00000000
+    - 0x9e3779b9
+    - 0x3c6ef372
+    - 0xdaa66d2b
+
+detection:
+  burst_threshold: 5          # minimum absolute packets to be "bursty"
+  adaptive_threshold_fraction: 0.05  # φ: flow_pkts/total_pkts >= φ (0=disabled)
+  rank_penalty: 10            # added to bursty flow ranks
+  bursty_table_size: 256      # flow_id hash table size
+
+priority:
+  mode: "dscp"                # "dscp" (6-bit from DSCP) or "srpt" (16-bit from identification)
+
+scheduler:
+  mode: "aifo"                # "aifo", "sppifo", or "packs"
+
+aifo:
+  k_percent: 20               # k=0.2 as percentage
+  max_queue_size: 64           # packets
+  window_size: 20              # sliding window slots (data-plane quantile)
+
+sppifo:
+  num_queues: 8               # number of SP-PIFO queues
+  max_rank: 63                # maximum expected rank value
+  initial_bounds: null         # null = auto-compute evenly, or list of 8 values
+
+packs:
+  num_queues: 8
+  rank_delta: 20
+  k_percent: 20
+
+controller:
+  poll_interval_ms: 100        # how often to poll for digests
+  stats_interval_s: 5          # how often to collect stats
+  log_file: "midst_stats.jsonl"
+  health_check_interval_s: 10  # VQ sanity, window cycling
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s [%(levelname)s] %(message)s"
