@@ -33,8 +33,13 @@ public abstract class TrafficPlanner {
      * @param srcId         Source network device identifier
      * @param dstId         Destination network device identifier
      * @param flowSizeByte  Flow size in bytes
+     * @param wasScheduledDuringBurst Whether this flow was scheduled during a burst
      */
     protected void registerFlow(long time, int srcId, int dstId, long flowSizeByte) {
+        registerFlow(time, srcId, dstId, flowSizeByte, false);
+    }
+
+    protected void registerFlow(long time, int srcId, int dstId, long flowSizeByte, boolean wasScheduledDuringBurst) {
 
         // Some checking
         if (srcId == dstId) {
@@ -50,7 +55,7 @@ public abstract class TrafficPlanner {
         }
 
         // Create event
-        FlowStartEvent event = new FlowStartEvent(time, idToTransportLayerMap.get(srcId), dstId, flowSizeByte);
+        FlowStartEvent event = new FlowStartEvent(time, idToTransportLayerMap.get(srcId), dstId, flowSizeByte, wasScheduledDuringBurst);
 
         // Register event
         Simulator.registerEvent(event);

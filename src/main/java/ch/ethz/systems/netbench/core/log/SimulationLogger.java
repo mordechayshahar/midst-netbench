@@ -1,13 +1,26 @@
 package ch.ethz.systems.netbench.core.log;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.io.output.TeeOutputStream;
+
 import ch.ethz.systems.netbench.core.Simulator;
 import ch.ethz.systems.netbench.core.config.NBProperties;
 import ch.ethz.systems.netbench.core.run.MainFromProperties;
-import org.apache.commons.io.output.TeeOutputStream;
-
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 public class SimulationLogger {
 
@@ -43,6 +56,11 @@ public class SimulationLogger {
     // Statistic counters
     private static Map<String, Long> statisticCounters = new HashMap<>();
 
+    // Flow metadata registries for enhanced CSV logging (C1a-c)
+    private static final java.util.concurrent.ConcurrentHashMap<Long, Boolean> flowBurstyGroundTruth = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.concurrent.ConcurrentHashMap<Long, Boolean> flowBurstyDetected = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.concurrent.ConcurrentHashMap<Long, Boolean> flowSrptStatus = new java.util.concurrent.ConcurrentHashMap<>();
+
     // Print streams used
     private static PrintStream originalOutOutputStream;
     private static PrintStream originalErrOutputStream;
@@ -63,6 +81,21 @@ public class SimulationLogger {
         } else {
             statisticCounters.put(name, val + 1L);
         }
+    }
+
+    /** Register ground-truth bursty status for a flow (called by MicroburstTrafficPlanner). */
+    public static void registerFlowBurstyGroundTruth(long flowId, boolean isBursty) {
+        flowBurstyGroundTruth.put(flowId, isBursty);
+    }
+
+    /** Register MIDST-detected bursty status for a flow (called by MIDSTImpl). */
+    public static void registerFlowBurstyDetected(long flowId) {
+        flowBurstyDetected.put(flowId, Boolean.TRUE);
+    }
+
+    /** Register SRPT status for a flow (called by NewRenoTcpSocket). */
+    public static void registerFlowSrpt(long flowId, boolean usesSrpt) {
+        flowSrptStatus.put(flowId, usesSrpt);
     }
 
     /**
@@ -387,13 +420,15 @@ public class SimulationLogger {
      *
      * @param ownId                 Port source network device identifier (device to which it is attached)
      * @param targetId              Port target network device identifier (where the other end of the cable is connected to)
+     * @param queueIndex            Index of the queue
      * @param queueLength           Current length of the queue
      * @param bufferOccupiedBits    Amount of bits occupied in the buffer
+     * @param maxQueueSize          Maximum queue size
      * @param absTimeNs             Absolute timestamp in nanoseconds since simulation epoch
      */
-    static void logPortQueueState(long ownId, long targetId, int queueLength, long bufferOccupiedBits, long absTimeNs) {
+    static void logPortQueueState(long ownId, long targetId, int queueIndex, int queueLength, long bufferOccupiedBits, long maxQueueSize, long absTimeNs) {
         try {
-            writerPortQueueStateFile.write(ownId + "," + targetId + "," + queueLength + "," + bufferOccupiedBits + "," + absTimeNs + "\n");
+            writerPortQueueStateFile.write(ownId + "," + targetId + "," + queueIndex + "," + queueLength + "," + bufferOccupiedBits + "," + maxQueueSize + "," + absTimeNs + "\n");
         } catch (IOException e) {
             throw new LogFailureException(e);
         }
@@ -454,9 +489,14 @@ public class SimulationLogger {
                     );
                 }
 
-                // flowId, sourceId, targetId, sentBytes, totalBytes, flowStartTime, flowEndTime, flowDuration, isCompleted
+                // flowId, sourceId, targetId, sentBytes, totalBytes, flowStartTime, flowEndTime, flowDuration, isCompleted,
+                // isBurstyGroundTruth, isBurstyDetected, isSrpt
+                long fid = logger.getFlowId();
+                boolean burstyGT = flowBurstyGroundTruth.getOrDefault(fid, false);
+                boolean burstyDet = flowBurstyDetected.getOrDefault(fid, false);
+                boolean srpt = flowSrptStatus.getOrDefault(fid, false);
                 writerFlowCompletionCsvFile.write(
-                        logger.getFlowId() + "," +
+                        fid + "," +
                                 logger.getSourceId() + "," +
                                 logger.getTargetId() + "," +
                                 logger.getTotalBytesReceived() + "," +
@@ -464,7 +504,10 @@ public class SimulationLogger {
                                 logger.getFlowStartTime() + "," +
                                 (logger.isCompleted() ? logger.getFlowEndTime() : Simulator.getCurrentTime()) + "," +
                                 (logger.isCompleted() ? (logger.getFlowEndTime() - logger.getFlowStartTime()) : (Simulator.getCurrentTime() - logger.getFlowStartTime())) + "," +
-                                (logger.isCompleted() ? "TRUE" : "FALSE") + "\n"
+                                (logger.isCompleted() ? "TRUE" : "FALSE") + "," +
+                                (burstyGT ? "TRUE" : "FALSE") + "," +
+                                (burstyDet ? "TRUE" : "FALSE") + "," +
+                                (srpt ? "TRUE" : "FALSE") + "\n"
                 );
 
             }

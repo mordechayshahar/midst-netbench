@@ -46,12 +46,12 @@ public class TailDropOutputPort extends OutputPort {
                 ));
 
                 // It is now sending again
-                setIsSending();
+                setIsSending(true);
 
             } else { // If it is still sending, the packet is added to the queue, making it non-empty
                 increaseBufferOccupiedBits(packet.getSizeBit());
                 getQueue().add(packet);
-                getLogger().logQueueState(getQueue().size(), getBufferOccupiedBits());
+                getLogger().logQueueState(getQueue().size(), getBufferOccupiedBits(), 0L);
             }
 
         } else {

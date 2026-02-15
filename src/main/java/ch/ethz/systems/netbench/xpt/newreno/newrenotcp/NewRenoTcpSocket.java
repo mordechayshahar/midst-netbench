@@ -129,6 +129,11 @@ public class NewRenoTcpSocket extends Socket {
     // Flowlet tracking
     private long currentFlowlet;
 
+    // SRPT priority mode: when enabled, packets carry priority = remaining bytes
+    // partial_srpt mode: fraction of flows use SRPT, rest use priority=0 (no info)
+    private final boolean useSrptPriority;
+    private final boolean flowUsesSrpt; // Per-flow decision for partial_srpt mode
+
 
     ////////////////////////////////////////////////////////
     /// TCP IMPLEMENTATION
@@ -235,6 +240,25 @@ public class NewRenoTcpSocket extends Socket {
 
         // TCP logger
         this.tcpLogger = new TcpLogger(flowId, flowSizeByte == -1);
+
+        // SRPT priority mode: if enabled, packets carry priority = remaining bytes (like pFabric)
+        // This allows SP-PIFO to do meaningful priority scheduling with standard TCP congestion control.
+        // Default "none" preserves existing behavior (priority=0 on all packets).
+        // "partial_srpt" mode: a fraction of flows use SRPT, rest use priority=0 (simulates
+        // realistic deployment where not all apps know their flow size).
+        String priorityMode = Simulator.getConfiguration().getPropertyWithDefault("tcp_priority_mode", "none");
+        this.useSrptPriority = "srpt".equalsIgnoreCase(priorityMode) || "partial_srpt".equalsIgnoreCase(priorityMode);
+
+        if ("partial_srpt".equalsIgnoreCase(priorityMode)) {
+            double fraction = Simulator.getConfiguration().getDoublePropertyWithDefault("tcp_partial_srpt_fraction", 0.5);
+            // Deterministic per-flow: use flowId modulo to decide (reproducible across runs)
+            this.flowUsesSrpt = (flowId % 100) < (long)(fraction * 100);
+        } else {
+            this.flowUsesSrpt = this.useSrptPriority;
+        }
+
+        // C1c: Register SRPT status for enhanced CSV logging
+        SimulationLogger.registerFlowSrpt(flowId, this.flowUsesSrpt);
 
     }
 
@@ -512,6 +536,8 @@ public class NewRenoTcpSocket extends Socket {
 
         // Log
         SimulationLogger.increaseStatisticCounter("TCP_FAST_RETRANSMIT");
+        // Log per-flow retransmission for detailed analysis
+        SimulationLogger.logInfo("TCP_RETRANSMIT_FLOW", flowId + ",FAST," + Simulator.getCurrentTime() + "," + seq);
 
     }
 
@@ -568,6 +594,10 @@ public class NewRenoTcpSocket extends Socket {
             this.slowStartThreshold = Math.max(this.flightSize() / 2, MINIMUM_SSTHRESH);
             this.congestionWindow = this.slowStartThreshold + 3 * MAX_SEGMENT_SIZE;
 
+            // LOW #15: Log congestion window drop on fast recovery entry
+            SimulationLogger.logInfo("TCP_CWND_CHANGE",
+                flowId + "," + (long) this.congestionWindow + "," + (long) this.slowStartThreshold + ",FAST_RECOVERY," + Simulator.getCurrentTime());
+
             // Recovery threshold
             this.recover = this.highestSentOutNumber;
             this.inFastRecovery = true;
@@ -577,6 +607,9 @@ public class NewRenoTcpSocket extends Socket {
 
         } else if (inFastRecovery) {
             this.congestionWindow += MAX_SEGMENT_SIZE;
+            // LOW #15: Log congestion window inflation during fast recovery
+            SimulationLogger.logInfo("TCP_CWND_CHANGE",
+                flowId + "," + (long) this.congestionWindow + "," + (long) this.slowStartThreshold + ",FAST_RECOVERY_INFLATE," + Simulator.getCurrentTime());
 
         } else if (count <= 2) { // !inFastRecovery
 
@@ -627,6 +660,10 @@ public class NewRenoTcpSocket extends Socket {
             smoothRoundTripTime = 0.875 * smoothRoundTripTime + 0.125 * RAcc;
         }
         roundTripTimeout = (long) (smoothRoundTripTime + 4 * roundTripTimeVariation);
+
+        // LOW #14: Log RTT sample
+        SimulationLogger.logInfo("TCP_RTT_SAMPLE",
+            flowId + "," + (long) RAcc + "," + (long) smoothRoundTripTime + "," + Simulator.getCurrentTime());
 
         // Whether it acknowledges anything new
         boolean newAck = false;
@@ -844,6 +881,10 @@ public class NewRenoTcpSocket extends Socket {
         // Limit to maximum window size
         this.congestionWindow = Math.min(this.congestionWindow, MAX_WINDOW_SIZE);
 
+        // LOW #15: Log congestion window evolution
+        SimulationLogger.logInfo("TCP_CWND_CHANGE",
+            flowId + "," + (long) this.congestionWindow + "," + (long) this.slowStartThreshold + ",INC," + Simulator.getCurrentTime());
+
     }
 
     /**
@@ -855,6 +896,7 @@ public class NewRenoTcpSocket extends Socket {
      * @param packet     TCP packet instance
      */
     private void sendWithoutResend(Packet packet) {
+        SimulationLogger.increaseStatisticCounter("TCP_TOTAL_PACKETS_SENT");
         transportLayer.send(packet);
     }
 
@@ -865,6 +907,7 @@ public class NewRenoTcpSocket extends Socket {
      * @param tcpPacket     TCP packet instance
      */
     private void sendWithResend(TcpPacket tcpPacket) {
+        SimulationLogger.increaseStatisticCounter("TCP_TOTAL_PACKETS_SENT");
         resetRetransmissionTimeOutTimer();
         transportLayer.send(tcpPacket);
     }
@@ -916,11 +959,17 @@ public class NewRenoTcpSocket extends Socket {
 
         // Take congestion control measures
         SimulationLogger.increaseStatisticCounter("TCP_RETRANSMISSION_TIMEOUT");
+        // Log per-flow retransmission for detailed analysis
+        SimulationLogger.logInfo("TCP_RETRANSMIT_FLOW", flowId + ",TIMEOUT," + Simulator.getCurrentTime() + "," + sendUnackNumber);
         this.inFastRecovery = false;
 
         // Adjust slow start threshold and congestion window accordingly
         this.slowStartThreshold = Math.max(this.flightSize() / 2.0, MINIMUM_SSTHRESH);
         this.congestionWindow = LOSS_WINDOW_SIZE;
+
+        // LOW #15: Log congestion window drop on timeout
+        SimulationLogger.logInfo("TCP_CWND_CHANGE",
+            flowId + "," + (long) this.congestionWindow + "," + (long) this.slowStartThreshold + ",TIMEOUT," + Simulator.getCurrentTime());
 
         // Per RFC 6298
         this.firstRttMeasurement = true; // Current estimate is probably bad
@@ -981,6 +1030,12 @@ public class NewRenoTcpSocket extends Socket {
             boolean SYN,
             boolean ECE
     ) {
+        // SRPT priority: remaining bytes in flow (lower = closer to completion = higher priority)
+        // When disabled (default), priority=0 preserving original behavior.
+        // In partial_srpt mode, only flows where flowUsesSrpt=true get SRPT priority;
+        // others keep priority=0, simulating apps that don't know their flow size.
+        long priority = flowUsesSrpt ? Math.max(0, flowSizeByte - sequenceNumber) : 0;
+
         return new FullExtTcpPacket(
                 flowId, dataSizeByte, sourceId, destinationId,
                 100, 80, 80, // TTL, source port, destination port
@@ -988,7 +1043,7 @@ public class NewRenoTcpSocket extends Socket {
                 false, false, ECE, // NS, CWR, ECE
                 false, ACK, false, // URG, ACK, PSH
                 false, SYN, false, // RST, SYN, FIN
-                congestionWindow, 0 // Window size, Priority
+                congestionWindow, priority // Window size, Priority
         );
     }
 

@@ -69,6 +69,7 @@ public class MainFromProperties {
         } else {
             System.out.println("No analysis command given; analysis is skipped.");
         }
+
     }
 
     /**
@@ -94,7 +95,11 @@ public class MainFromProperties {
                 BaseAllowedProperties.LOG,
                 BaseAllowedProperties.PROPERTIES_RUN,
                 BaseAllowedProperties.EXTENSION,
-                BaseAllowedProperties.EXPERIMENTAL
+                BaseAllowedProperties.EXPERIMENTAL,
+                BaseAllowedProperties.MICROBURST,
+                BaseAllowedProperties.SPPIFO,
+                BaseAllowedProperties.MIDST,
+                BaseAllowedProperties.FIXED_PRIORITY
         );
 
         // Dynamic overwrite of temporary config using arguments given from command line

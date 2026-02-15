@@ -10,13 +10,6 @@ public class BaseAllowedProperties {
             "enable_log_port_queue_state",
             "enable_log_flow_throughput",
             "enable_generate_human_readable_flow_completion_log",
-            "enable_log_delay",
-
-            // SP-PIFO
-            "enable_rank_mapping",
-            "enable_queue_bound_tracking",
-            "enable_unpifoness_tracking",
-            "enable_inversions_tracking"
     };
 
     public static final String[] PROPERTIES_RUN = new String[] {
@@ -52,6 +45,7 @@ public class BaseAllowedProperties {
             "traffic_probabilities_active_fraction_is_ordered",
             "traffic_lambda_flow_starts_per_s"
 
+
     };
 
     public static final String[] EXTENSION = new String[]{
@@ -82,22 +76,11 @@ public class BaseAllowedProperties {
 
             "traffic_probabilities_fraction_A",
             "traffic_probabilities_mass_A",
+
+
     };
 
     public static final String[] EXPERIMENTAL = new String[]{
-
-            // SP-PIFO
-            "output_port_number_queues",
-            "output_port_max_size_per_queue_packets",
-            "output_port_max_size_packets",
-            "output_port_max_rank",
-            "output_port_bytes_per_round",
-            "output_port_initialization",
-            "output_port_fix_queue_bounds",
-            "output_port_step_size",
-            "output_port_adaptation_period",
-            "transport_layer_rank_distribution",
-            "transport_layer_rank_bound",
 
             // TCP
             "TCP_ROUND_TRIP_TIMEOUT_NS",
@@ -111,6 +94,8 @@ public class BaseAllowedProperties {
             "DCTCP_WEIGHT_NEW_ESTIMATION",
             "enable_log_congestion_window",
             "enable_log_packet_burst_gap",
+            "tcp_priority_mode",
+            "tcp_partial_srpt_fraction",
 
             // K-shortest-paths
             "k_for_k_shortest_paths",
@@ -126,5 +111,67 @@ public class BaseAllowedProperties {
             "routing_ecmp_then_source_routing_switch_threshold_bytes"
 
     };
+    
+    public static final String[] MICROBURST = new String[]{
+            "microburst_steady_lambda",
+            "microburst_burst_lambda",
+            "microburst_burst_interval_ns",
+            "microburst_burst_duration_ns",
+            "microburst_fraction"
+    };
+    
+    public static final String[] SPPIFO = new String[]{
+    	    "enable_rank_mapping",
+    	    "enable_queue_bound_tracking",
+    	    "enable_unpifoness_tracking",
+    	    "enable_inversions_tracking",
+    	    "sppifo_trace_enabled",
+    	    "output_port_number_queues",
+    	    "output_port_max_size_per_queue_packets",
+    	    "output_port_step_size"
+    	};
+
+    public static final String[] FIXED_PRIORITY = new String[]{
+            "priority_mode",
+            "priority_multiplier",
+            "priority_base",
+            "priority_small_flow_rank",
+            "priority_medium_flow_rank",
+            "priority_large_flow_rank",
+            "priority_small_threshold_bytes",
+            "priority_large_threshold_bytes"
+    };
+    
+    public static final String[] MIDST = new String[]{
+    	    "midst_sketch_size",
+    	    "midst_num_hash_functions",
+    	    "midst_high_watermark_packets",
+    	    "midst_low_watermark_packets",
+    	    "midst_burst_threshold",
+    	    "midst_feedback_queue_type",
+    	    "midst_sppifo_congestion_penalty_rank",
+    	    "midst_penalty_target_queue",  // M4 FIX: SP-PIFO semantic penalty ("LAST" or queue index)
+    	    "packs_penalty_target_queue",  // M5a FIX: PACKS semantic penalty ("LAST" or queue index)
+    	    "midst_sppifo_rank_delta",
+    	    "midst_sppifo_num_queues",
+    	    "midst_baseline_queue_internal_logging_enabled",
+    	    "midst_sppifo_queue_internal_logging_enabled",
+    	    "midst_aifo_queue_internal_logging_enabled",
+    	    "midst_real_aifo_logging_enabled",
+    	    "midst_use_virtual_fill_level",
+    	    "midst_port_vfl_fraction",
+    	    "midst_adaptive_threshold_fraction",
+    	    // Real AIFO parameters
+    	    "aifo_k",
+    	    "aifo_window_size",
+    	    "aifo_sample_count",
+    	    "aifo_rank_penalty",
+    	    "aifo_admission_penalty",  // M5b FIX: AIFO-specific admission rejection penalty ("REJECT" or numeric)
+    	    // AIFO MIDST detection mode (rejection rate vs queue depth)
+    	    "aifo_use_rejection_rate_detection",
+    	    "aifo_rejection_rate_threshold",
+    	    "aifo_rejection_window_size",
+    	};
+
 
 }

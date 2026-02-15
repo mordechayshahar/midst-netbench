@@ -1,11 +1,9 @@
 package ch.ethz.systems.netbench.core.network;
 
+import java.util.Queue;
+
 import ch.ethz.systems.netbench.core.Simulator;
 import ch.ethz.systems.netbench.core.log.PortLogger;
-import ch.ethz.systems.netbench.core.log.SimulationLogger;
-import ch.ethz.systems.netbench.xpt.tcpbase.FullExtTcpPacket;
-
-import java.util.Queue;
 
 
 /**
@@ -61,6 +59,25 @@ public abstract class OutputPort {
         this.logger = new PortLogger(this);
 
     }
+    
+    protected OutputPort(NetworkDevice ownNetworkDevice, NetworkDevice targetNetworkDevice, Link link, Queue<Packet> queue, boolean logQueueStateEnabled) {
+
+        // State
+        this.queue = queue;
+        this.isSending = false;
+        this.link = link;
+        this.bufferOccupiedBits = 0;
+
+        // References
+        this.ownNetworkDevice = ownNetworkDevice;
+        this.ownId = this.ownNetworkDevice.getIdentifier();
+        this.targetNetworkDevice = targetNetworkDevice;
+        this.targetId = this.targetNetworkDevice.getIdentifier();
+
+     // Logging
+        this.logger = new PortLogger(this, logQueueStateEnabled);
+
+    }
 
     /**
      * Enqueue the given packet for sending.
@@ -79,7 +96,7 @@ public abstract class OutputPort {
      *
      * @param packet    Packet instance that was being sent
      */
-    void dispatch(Packet packet) {
+    protected void dispatch(Packet packet) {
 
         // Finished sending packet, the last bit of the packet should arrive the link-delay later
         if (!link.doesNextTransmissionFail(packet.getSizeBit())) {
@@ -102,7 +119,7 @@ public abstract class OutputPort {
             Packet packetFromQueue = queue.poll();
 
             decreaseBufferOccupiedBits(packetFromQueue.getSizeBit());
-            logger.logQueueState(queue.size(), bufferOccupiedBits);
+            logger.logQueueState(queue.size(), bufferOccupiedBits, Simulator.getCurrentTime());
 
             // Register when the packet is actually dispatched
             Simulator.registerEvent(new PacketDispatchedEvent(
@@ -193,15 +210,17 @@ public abstract class OutputPort {
      *
      * @return  Queue instance
      */
-    protected Queue<Packet> getQueue() {
+    public Queue<Packet> getQueue() {
         return queue;
     }
 
-    protected Boolean getIsSending() { return isSending; }
+    public Boolean getIsSending() { return isSending; }
 
     protected void setIsSending() { isSending = true; }
 
-    protected PortLogger getLogger() {
+    protected void setIsSending(Boolean isSendingParam) { if(isSendingParam == null) { isSending = true; } else { isSending = isSendingParam; } }
+
+    public PortLogger getLogger() {
         return logger;
     }
 

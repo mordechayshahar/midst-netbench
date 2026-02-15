@@ -52,11 +52,15 @@ public class BoundedPriorityOutputPort extends OutputPort {
 
     @Override
     public void enqueue(Packet packet) {
-        guaranteedEnqueue(packet);
+        // TODO: guaranteedEnqueue method doesn't exist in base OutputPort.
+        // This port type is not used for thesis. Will fix if needed.
+        // guaranteedEnqueue(packet);
+        getQueue().add(packet);
+        increaseBufferOccupiedBits(packet.getSizeBit());
         while (getBufferOccupiedBits() > maxQueueSizeInBits){
         	decreaseBufferOccupiedBits(priorityQueue.pollLast().getSizeBit());
         }
-        
+
     }
 
 }

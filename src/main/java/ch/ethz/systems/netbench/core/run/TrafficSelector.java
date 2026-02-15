@@ -1,17 +1,25 @@
 package ch.ethz.systems.netbench.core.run;
 
-import ch.ethz.systems.netbench.core.Simulator;
-import ch.ethz.systems.netbench.core.config.exceptions.PropertyValueInvalidException;
-import ch.ethz.systems.netbench.core.network.TransportLayer;
-import ch.ethz.systems.netbench.ext.poissontraffic.FromStringArrivalPlanner;
-import ch.ethz.systems.netbench.core.run.traffic.TrafficPlanner;
-import ch.ethz.systems.netbench.ext.poissontraffic.PoissonArrivalPlanner;
-import ch.ethz.systems.netbench.ext.trafficpair.TrafficPairPlanner;
-import ch.ethz.systems.netbench.ext.poissontraffic.flowsize.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import ch.ethz.systems.netbench.core.Simulator;
+import ch.ethz.systems.netbench.core.config.exceptions.PropertyValueInvalidException;
+import ch.ethz.systems.netbench.core.network.TransportLayer;
+import ch.ethz.systems.netbench.core.run.traffic.TrafficPlanner;
+import ch.ethz.systems.netbench.core.run.traffic.microburst.MicroburstTrafficPlanner;
+import ch.ethz.systems.netbench.ext.poissontraffic.FromStringArrivalPlanner;
+import ch.ethz.systems.netbench.ext.poissontraffic.PoissonArrivalPlanner;
+import ch.ethz.systems.netbench.ext.poissontraffic.flowsize.FlowSizeDistribution;
+import ch.ethz.systems.netbench.ext.poissontraffic.flowsize.OriginalSimonFSD;
+import ch.ethz.systems.netbench.ext.poissontraffic.flowsize.PFabricDataMiningLowerBoundFSD;
+import ch.ethz.systems.netbench.ext.poissontraffic.flowsize.PFabricDataMiningUpperBoundFSD;
+import ch.ethz.systems.netbench.ext.poissontraffic.flowsize.PFabricWebSearchLowerBoundFSD;
+import ch.ethz.systems.netbench.ext.poissontraffic.flowsize.PFabricWebSearchUpperBoundFSD;
+import ch.ethz.systems.netbench.ext.poissontraffic.flowsize.ParetoFSD;
+import ch.ethz.systems.netbench.ext.poissontraffic.flowsize.UniformFSD;
+import ch.ethz.systems.netbench.ext.trafficpair.TrafficPairPlanner;
 
 class TrafficSelector {
 
@@ -35,6 +43,11 @@ class TrafficSelector {
                 FlowSizeDistribution flowSizeDistribution;
                 switch (Simulator.getConfiguration().getPropertyOrFail("traffic_flow_size_dist")) {
 
+                    case "original_simon": {
+                        flowSizeDistribution = new OriginalSimonFSD();
+                        break;
+                    }
+
                     case "pfabric_data_mining_lower_bound": {
                         flowSizeDistribution = new PFabricDataMiningLowerBoundFSD();
                         break;
@@ -46,16 +59,6 @@ class TrafficSelector {
 
                     case "pfabric_web_search_lower_bound": {
                         flowSizeDistribution = new PFabricWebSearchLowerBoundFSD();
-                        break;
-                    }
-
-                    case "pfabric_data_mining_albert": {
-                        flowSizeDistribution = new pFabricDataMiningAlbert();
-                        break;
-                    }
-
-                    case "pfabric_web_search_albert": {
-                        flowSizeDistribution = new pFabricWebSearchAlbert();
                         break;
                     }
 
@@ -209,7 +212,8 @@ class TrafficSelector {
 
             case "traffic_arrivals_string":
                 return new FromStringArrivalPlanner(idToTransportLayer, Simulator.getConfiguration().getPropertyOrFail("traffic_arrivals_list"));
-
+            case "microburst":
+                return new MicroburstTrafficPlanner(idToTransportLayer);
             default:
                 throw new PropertyValueInvalidException(
                         Simulator.getConfiguration(),

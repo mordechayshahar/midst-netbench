@@ -1,6 +1,9 @@
 package ch.ethz.systems.netbench.core.network;
 
+import ch.ethz.systems.netbench.core.Simulator;
+import ch.ethz.systems.netbench.core.log.SimulationLogger;
 import ch.ethz.systems.netbench.ext.basic.IpPacket;
+import ch.ethz.systems.netbench.xpt.ports.midst_feedback.queue.impl.NewCanonicalSPPIFOQueue;
 import ch.ethz.systems.netbench.xpt.tcpbase.FullExtTcpPacket;
 
 import java.util.HashMap;
@@ -92,22 +95,55 @@ public abstract class TransportLayer {
     }
 
     /**
-     * Start the sending of a flow to the destination.
+     * Start the sending of a flow to the destination (backward-compatible overload).
      *
      * @param destination       Destination network device identifier
      * @param flowSizeByte      Byte size of the flow
      */
     public void startFlow(int destination, long flowSizeByte) {
+        startFlow(destination, flowSizeByte, false);
+    }
+
+    /**
+     * Start the sending of a flow to the destination.
+     *
+     * @param destination                Destination network device identifier
+     * @param flowSizeByte               Byte size of the flow
+     * @param wasScheduledDuringBurst    Whether the flow was scheduled during a microburst
+     */
+    public void startFlow(int destination, long flowSizeByte, boolean wasScheduledDuringBurst) {
+
+    	// *** CAPTURE THE ID TO BE USED FOR THIS FLOW ***
+        long currentFlowId = flowIdCounter;
+
+        // C1a fix: Register ground-truth bursty status HERE (not in MicroburstTrafficPlanner)
+        // because flowIdCounter is only valid at startFlow() time, not at scheduling time.
+        SimulationLogger.registerFlowBurstyGroundTruth(currentFlowId, wasScheduledDuringBurst);
+
+        // C2 fix: Register bursty status with the queue HERE for the same reason.
+        NewCanonicalSPPIFOQueue.registerFlowBurstyStatus(currentFlowId, wasScheduledDuringBurst);
 
         // Create new outgoing socket
         Socket socket = createSocket(flowIdCounter, destination, flowSizeByte);
         flowIdToSocket.put(flowIdCounter, socket);
+        
+        // *** ADD LOGGING HERE ***
+        // Log the link between the assigned flow ID and its properties
+        SimulationLogger.logInfo("FLOW_INITIATED",
+            currentFlowId + "," +           // The actual NetBench Flow ID
+            this.identifier + "," +        // Source Node ID
+            destination + "," +            // Destination Node ID
+            flowSizeByte + "," +           // Flow Size
+            Simulator.getCurrentTime() + "," +     // Actual Start Time (ns)
+            (wasScheduledDuringBurst ? "T" : "F") // Add the flag as T/F
+        );
+        // *************************
+        
         flowIdCounter++;
 
         // Start the socket off as initiator
         socket.markAsSender();
         socket.start();
-
     }
 
     /**
@@ -147,6 +183,14 @@ public abstract class TransportLayer {
     void cleanupSockets(long flowId) {
         this.removeSocket(flowId);
         flowIdToReceiver.get(flowId).removeSocket(flowId);
+    }
+
+    /**
+     * Get the next flow ID to be used.
+     * @return The next flow ID
+     */
+    public static long getNextFlowId() {
+        return flowIdCounter;
     }
 
     /**

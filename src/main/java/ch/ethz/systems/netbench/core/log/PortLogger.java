@@ -32,6 +32,36 @@ public class PortLogger {
         SimulationLogger.registerPortLogger(this);
         this.logQueueStateEnabled = Simulator.getConfiguration().getBooleanPropertyWithDefault("enable_log_port_queue_state", false);
     }
+    
+    /**
+     * Create logger for the given port, with logQueueStateEnabled.
+     *
+     * @param port  Output port instance
+     * @param logQueueStateEnabled  Log queue state enabled definition
+     */
+    public PortLogger(OutputPort port, boolean logQueueStateEnabled) {
+        this.ownId = port.getOwnId();
+        this.targetId = port.getTargetId();
+        this.attachedToServer = port.getOwnDevice().isServer() || port.getTargetDevice().isServer();
+        SimulationLogger.registerPortLogger(this);
+        this.logQueueStateEnabled = logQueueStateEnabled;
+    }
+
+    /**
+     * Log the current queue length of the output port.
+     *
+     * @param queueIndex          Queue index
+     * @param length                Current queue length in packets
+     * @param bufferOccupiedBits    Amount of bits occupied in the buffer
+     */
+    public void logQueueState(int queueIndex, int length, long bufferOccupiedBits, long maxQueueSize) {
+        if (this.logQueueStateEnabled) {
+            iterator++;
+            if (iterator % STATISTIC_SAMPLE_RATE == 0) {
+                SimulationLogger.logPortQueueState(ownId, targetId, queueIndex, length, bufferOccupiedBits, maxQueueSize, Simulator.getCurrentTime());
+            }
+        }
+    }
 
     /**
      * Log the current queue length of the output port.
@@ -39,13 +69,18 @@ public class PortLogger {
      * @param length                Current queue length in packets
      * @param bufferOccupiedBits    Amount of bits occupied in the buffer
      */
+    public void logQueueState(int length, long bufferOccupiedBits, long maxQueueSize) {
+        logQueueState(-1, length, bufferOccupiedBits, maxQueueSize);
+    }
+
+    /**
+     * Log the current queue length (backward-compatible 2-arg overload).
+     *
+     * @param length                Current queue length in packets
+     * @param bufferOccupiedBits    Amount of bits occupied in the buffer
+     */
     public void logQueueState(int length, long bufferOccupiedBits) {
-        if (this.logQueueStateEnabled) {
-            iterator++;
-            if (iterator % STATISTIC_SAMPLE_RATE == 0) { // TODO: get rid of statistic sample rate?
-                SimulationLogger.logPortQueueState(ownId, targetId, length, bufferOccupiedBits, Simulator.getCurrentTime());
-            }
-        }
+        logQueueState(-1, length, bufferOccupiedBits, 0);
     }
 
     /**

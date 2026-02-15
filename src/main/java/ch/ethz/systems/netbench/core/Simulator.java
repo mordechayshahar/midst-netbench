@@ -185,7 +185,7 @@ public class Simulator {
             if (now > nextProgressLog) {
                 nextProgressLog += PROGRESS_SHOW_INTERVAL_NS;
                 long realTimeNow = System.currentTimeMillis();
-                System.out.println("Elapsed 0.01s simulation in " + ((realTimeNow - realTime) / 1000.0) + "s real (total progress: " + ((((double) now) / ((double) runtimeNanoseconds)) * 100) + "%).");
+                //System.out.println("Elapsed 0.01s simulation in " + ((realTimeNow - realTime) / 1000.0) + "s real (total progress: " + ((((double) now) / ((double) runtimeNanoseconds)) * 100) + "%).");
                 realTime = realTimeNow;
             }
 
@@ -249,7 +249,16 @@ public class Simulator {
     }
 
     /**
-     * Retrieve the current enqueue counter (Required for the PIFO queue)
+     * Retrieve the amount of events currently in the event queue.
+     *
+     * @return  Number of events
+     */
+    public static int getEventSize() {
+        return eventQueue.size();
+    }
+
+    /**
+     * Retrieve the current enqueue counter (Required for the PIFO queue).
      *
      * @return  A counter that is increased by one every time a new packet is enqueued to a PIFO
      */
@@ -258,21 +267,12 @@ public class Simulator {
     }
 
     /**
-     * Retrieve the current enqueue counter (Required for the PIFO queue)
+     * Set the current enqueue counter (Required for the PIFO queue).
      *
-     * @return  A counter that is increased by one every time a new packet is enqueued to a PIFO
+     * @param updatedEnqueueCounter  Updated counter value
      */
     public static void setEnqueueCounter(long updatedEnqueueCounter) {
         enqueueCounter = updatedEnqueueCounter;
-    }
-
-    /**
-     * Retrieve the amount of events currently in the event queue.
-     *
-     * @return  Number of events
-     */
-    public static int getEventSize() {
-        return eventQueue.size();
     }
 
     /**

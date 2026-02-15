@@ -24,6 +24,7 @@ public class EcnTailDropOutputPort extends OutputPort {
      */
     @Override
     public void enqueue(Packet packet) {
+        SimulationLogger.increaseStatisticCounter("TOTAL_PACKETS_ENQUEUED");
 
         // Convert to IP packet
         IpHeader ipHeader = (IpHeader) packet;
@@ -51,12 +52,12 @@ public class EcnTailDropOutputPort extends OutputPort {
                 ));
 
                 // It is now sending again
-                setIsSending();
+                setIsSending(true);
 
             } else { // If it is still sending, the packet is added to the queue, making it non-empty
                 getQueue().add(packet);
                 increaseBufferOccupiedBits(packet.getSizeBit());
-                getLogger().logQueueState(getQueue().size(), getBufferOccupiedBits());
+                getLogger().logQueueState(getQueue().size(), getBufferOccupiedBits(), 0L);
             }
 
         } else {
